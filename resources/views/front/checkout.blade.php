@@ -1,24 +1,25 @@
 @extends('front.layout.layout')
 
 @section('title')
-    Checkout
+Checkout
 @endsection
 
 @section('content')
-    <section class="section-5 pt-3 pb-3 mb-3 bg-white">
-        <div class="container">
-            <div class="light-font">
-                <ol class="breadcrumb primary-color mb-0">
-                    <li class="breadcrumb-item"><a class="white-text" href="#">Home</a></li>
-                    <li class="breadcrumb-item"><a class="white-text" href="#">Shop</a></li>
-                    <li class="breadcrumb-item">Checkout</li>
-                </ol>
-            </div>
+<section class="section-5 pt-3 pb-3 mb-3 bg-white">
+    <div class="container">
+        <div class="light-font">
+            <ol class="breadcrumb primary-color mb-0">
+                <li class="breadcrumb-item"><a class="white-text" href="#">Home</a></li>
+                <li class="breadcrumb-item"><a class="white-text" href="#">Shop</a></li>
+                <li class="breadcrumb-item">Checkout</li>
+            </ol>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="section-9 pt-4">
-        <div class="container">
+<section class="section-9 pt-4">
+    <div class="container">
+        <form action="" id="checkoutForm">
             <div class="row">
                 <div class="col-md-8">
                     <div class="sub-title">
@@ -26,89 +27,91 @@
                     </div>
                     <div class="card shadow-lg border-0">
                         <div class="card-body checkout-form">
-                            <form action="" id="checkoutForm">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="mb-3">
-                                            <input type="text" name="first_name" id="first_name" class="form-control"
-                                                placeholder="First Name">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="mb-3">
-                                            <input type="text" name="last_name" id="last_name" class="form-control"
-                                                placeholder="Last Name">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-12">
-                                        <div class="mb-3">
-                                            <input type="text" name="email" id="email" class="form-control"
-                                                placeholder="Email">
-                                        </div>
-                                    </div>
-                                    @if ($country->isNotEmpty())
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <select name="country" id="country" class="form-control">
-                                                    <option value="">Select a Country</option>
-                                                    @foreach ($country as $cnt)
-                                                        <option value="{{ $cnt->id }}">{{ $cnt->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                    @endif
-
-
-                                    <div class="col-md-12">
-                                        <div class="mb-3">
-                                            <textarea name="address" id="address" cols="30" rows="3" placeholder="Address" class="form-control"></textarea>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-12">
-                                        <div class="mb-3">
-                                            <input type="text" name="appartment" id="appartment" class="form-control"
-                                                placeholder="Apartment, suite, unit, etc. (optional)">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <input type="text" name="city" id="city" class="form-control"
-                                                placeholder="City">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <input type="text" name="state" id="state" class="form-control"
-                                                placeholder="State">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <input type="text" name="zip" id="zip" class="form-control"
-                                                placeholder="Zip">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-12">
-                                        <div class="mb-3">
-                                            <input type="text" name="mobile" id="mobile" class="form-control"
-                                                placeholder="Mobile No.">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="mb-3">
-                                            <textarea name="order_notes" id="order_notes" cols="30" rows="2" placeholder="Order Notes (optional)"
-                                                class="form-control"></textarea>
-                                        </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <input type="text" name="first_name" id="first_name" class="form-control"
+                                            placeholder="First Name">
+                                        <p></p>
                                     </div>
                                 </div>
-                            </form>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <input type="text" name="last_name" id="last_name" class="form-control"
+                                            placeholder="Last Name">
+                                        <p></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <input type="text" name="email" id="email" class="form-control"
+                                            placeholder="Email">
+                                        <p></p>
+                                    </div>
+                                </div>
+                                @if ($country->isNotEmpty())
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <select name="country" id="country" class="form-control">
+                                            <option value="">Select a Country</option>
+                                            @foreach ($country as $cnt)
+                                            <option value="{{ $cnt->id }}">{{ $cnt->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <p></p>
+                                    </div>
+                                </div>
+                                @endif
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <textarea name="address" id="address" cols="30" rows="3" placeholder="Address" class="form-control"></textarea>
+                                        <p></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <input type="text" name="appartment" id="appartment" class="form-control"
+                                            placeholder="Apartment, suite, unit, etc. (optional)">
+                                        <p></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <input type="text" name="city" id="city" class="form-control"
+                                            placeholder="City">
+                                        <p></p>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <input type="text" name="state" id="state" class="form-control"
+                                            placeholder="State">
+                                        <p></p>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <input type="text" name="zip" id="zip" class="form-control"
+                                            placeholder="Zip">
+                                        <p></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <input type="text" name="mobile" id="mobile" class="form-control"
+                                            placeholder="Mobile No.">
+                                        <p></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <textarea name="order_notes" id="order_notes" cols="30" rows="2" placeholder="Order Notes (optional)"
+                                            class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -119,10 +122,10 @@
                     <div class="card cart-summery">
                         <div class="card-body">
                             @foreach (Cart::content() as $cart)
-                                <div class="d-flex justify-content-between pb-2">
-                                    <div class="h6">{{ $cart->name }}</div>
-                                    <div class="h6">{{ $cart->price }} X {{ $cart->qty }}</div>
-                                </div>
+                            <div class="d-flex justify-content-between pb-2">
+                                <div class="h6">{{ $cart->name }}</div>
+                                <div class="h6">{{ $cart->price }} X {{ $cart->qty }}</div>
+                            </div>
                             @endforeach
                             <div class="d-flex justify-content-between summery-end">
                                 <div class="h6"><strong>Subtotal</strong></div>
@@ -138,7 +141,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="card payment-form ">
                         <h3 class="card-title h5 mb-3">Payment Details</h3>
                         <div class="card-body p-2">
@@ -147,7 +149,7 @@
                                     <input checked type="radio" name="payment" id="paymentOne" value="p-one">
                                     <label for="paymentOne">COD</label>
                                     <br>
-                                    <input type="radio" name="payment" id="paymentTwo"value="p-two">
+                                    <input type="radio" name="payment" id="paymentTwo" value="p-two">
                                     <label for="paymentTwo">Stripe</label>
                                 </div>
                             </div>
@@ -170,59 +172,58 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="pt-4">
-                                <a href="#" class="btn-dark btn btn-block w-100">Pay Now</a>
+                                <button type="submit" class="btn-dark btn btn-block w-100">Pay Now</button>
                             </div>
                         </div>
                     </div>
                     <!-- CREDIT CARD FORM ENDS HERE -->
                 </div>
             </div>
-        </div>
-    </section>
+        </form>
+    </div>
+</section>
 @endsection
 
 @section('custom-js')
-    <script>
-        $('#paymentOne').click(function() {
-            if ($(this).is(':checked')) {
-                $('.stripPayment').addClass('d-none');
-            }
-        })
-        $('#paymentTwo').click(function() {
-            if ($(this).is(':checked')) {
-                $('.stripPayment').removeClass('d-none');
-            }
-        })
+<script>
+    $('#paymentOne').click(function() {
+        if ($(this).is(':checked')) {
+            $('.stripPayment').addClass('d-none');
+        }
+    })
+    $('#paymentTwo').click(function() {
+        if ($(this).is(':checked')) {
+            $('.stripPayment').removeClass('d-none');
+        }
+    })
 
-        $('#checkoutForm').submit(function(e) {
-            e.preventDefault();
-            var element = $(this);
-            $("button[type=submit]").prop('disabled', true);
-            $.ajax({
-                url: "{{ route('admin-category-store') }}",
-                type: 'post',
-                data: element.serializeArray(),
-                dataType: 'json',
-                success: function(response) {
-                    $("button[type=submit]").prop('disabled', false);
-                    if (response['status'] == true) {
-                        $("input[type='text'], input[type='number'], select").removeClass('is-invalid');
-                        $('.error').removeClass('invalid-feedback').html('');
-                        window.location.href = "{{ route('category-list') }}"
-                    } else {
-                        var errors = response['errors'];
-                        console.log(errors);
-                        $("input[type='text'], input[type='number'], select").removeClass('is-invalid');
-                        $('.error').removeClass('invalid-feedback').html('');
-                        $.each(errors, function(key, value) {
-                            $(`#${key}`).addClass('is-invalid').siblings('p').addClass(
-                                'invalid-feedback').html(value);
-                        })
-                    }
+    $('#checkoutForm').submit(function(e) {
+        e.preventDefault();
+        var element = $(this);
+        $("button[type=submit]").prop('disabled', true);
+        $.ajax({
+            url: "{{ route('user-checkout-store') }}",
+            type: 'post',
+            data: element.serializeArray(),
+            dataType: 'json',
+            success: function(response) {
+                $("button[type=submit]").prop('disabled', false);
+                if (response['status'] == true) {
+                    $("input[type='text'], input[type='number'], select").removeClass('is-invalid');
+                    $('.error').removeClass('invalid-feedback').html('');
+                } else {
+                    var errors = response['errors'];
+                    console.log(errors);
+                    $("input[type='text'], input[type='number'], select").removeClass('is-invalid');
+                    $('.error').removeClass('invalid-feedback').html('');
+                    $.each(errors, function(key, value) {
+                        $(`#${key}`).addClass('is-invalid').siblings('p').addClass(
+                            'invalid-feedback').html(value);
+                    })
                 }
-            })
-        });
-    </script>
+            }
+        })
+    });
+</script>
 @endsection

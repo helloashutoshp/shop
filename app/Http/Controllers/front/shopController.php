@@ -4,10 +4,14 @@ namespace App\Http\Controllers\front;
 
 use App\Http\Controllers\Controller;
 use App\Models\CountryModel;
+use App\Models\orderModel;
 use App\Models\Product;
+use App\Models\userShipping;
 use Illuminate\Http\Request;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Stripe\Climate\Order;
 
 class shopController extends Controller
 {
@@ -129,6 +133,81 @@ class shopController extends Controller
         }
         session()->forget('url.checkout');
         $country = CountryModel::all();
-        return view('front.checkout',['country'=>$country]);
+        return view('front.checkout', ['country' => $country]);
+    }
+
+    public function checkOutStore(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email',
+            'country' => 'required',
+            'address' => 'required',
+            'appartment' => 'required',
+            'city' => 'required',
+            'state' => 'required',
+            'zip' => 'required',
+            'mobile' => 'required|digits:10',
+        ], [
+            'mobile.digits' => 'Please enter a valid phone number',
+            'mobile.number' => 'Please enter a valid phone number',
+        ]);
+        if ($validator->passes()) {
+            $user = Auth::user();
+            // session()->flash('success', 'Successfully  created');
+            userShipping::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'user_id' => $user->id,
+                    'firstName' => $req->first_name,
+                    'lastName' => $req->last_name,
+                    'email' => $req->email,
+                    'mobile' => $req->mobile,
+                    'country_id' => $req->country,
+                    'address' => $req->address,
+                    'appartment' => $req->appartment,
+                    'city' => $req->city,
+                    'state' => $req->state,
+                    'zip' => $req->zip,
+                ]
+            );
+
+            $order = new orderModel();
+            if ($req->payment == "p-one") {
+                // dd("hey");
+                $shipping=0;
+                $discount=0;
+                $subtotal = Cart::subtotal(2,'.','');
+                $grandTotal = $shipping+$subtotal;
+
+                $order->user_id = $user->id;
+                $order->shipping = $shipping;
+                $order->subtotal = $subtotal;
+                $order->grandTotal = $grandTotal;
+                $order->firstName = $req->first_name;
+                $order->lastName = $req->last_name;
+                $order->email = $req->email;
+                $order->mobile = $req->mobile;
+                $order->country_id  = $req->country;
+                $order->address = $req->address;
+                $order->appartment = $req->appartment;
+                $order->city = $req->city;
+                $order->state = $req->state;
+                $order->zip = $req->zip;
+                $order->note = $req->order_notes;
+                $order->save();
+            }
+            return response()->json([
+                'status' => true,
+                'message' => "vlaidation done",
+
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
     }
 }
