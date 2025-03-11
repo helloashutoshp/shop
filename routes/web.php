@@ -38,6 +38,7 @@ Route::post('/cart/update', [shopController::class, 'cartUpdate'])->name('cartUp
 Route::post('/cart/delete', [shopController::class, 'cartDelete'])->name('cartDelete');
 Route::get('/checkout', [shopController::class, 'checkOut'])->name('checkOut');
 Route::post('/checkout', [shopController::class, 'checkOutStore'])->name('user-checkout-store');
+Route::get('/thank-you', [shopController::class, 'thankyou'])->name('user-thank');
 
 
 

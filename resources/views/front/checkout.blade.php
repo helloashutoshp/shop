@@ -31,21 +31,21 @@ Checkout
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <input type="text" name="first_name" id="first_name" class="form-control"
-                                            placeholder="First Name">
+                                            placeholder="First Name" value="{{!empty($address) ? $address->firstName : ''}}">
                                         <p></p>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <input type="text" name="last_name" id="last_name" class="form-control"
-                                            placeholder="Last Name">
+                                            placeholder="Last Name" value="{{!empty($address) ? $address->lastName	 : ''}}">
                                         <p></p>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <input type="text" name="email" id="email" class="form-control"
-                                            placeholder="Email">
+                                            placeholder="Email" value="{{!empty($address) ? $address->email : ''}}">
                                         <p></p>
                                     </div>
                                 </div>
@@ -55,7 +55,7 @@ Checkout
                                         <select name="country" id="country" class="form-control">
                                             <option value="">Select a Country</option>
                                             @foreach ($country as $cnt)
-                                            <option value="{{ $cnt->id }}">{{ $cnt->name }}</option>
+                                            <option {{(!empty($address) && ($address->country_id == $cnt->id))  ? 'selected' : ''}} value="{{ $cnt->id }}">{{ $cnt->name }}</option>
                                             @endforeach
                                         </select>
                                         <p></p>
@@ -64,21 +64,21 @@ Checkout
                                 @endif
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <textarea name="address" id="address" cols="30" rows="3" placeholder="Address" class="form-control"></textarea>
+                                        <textarea name="address" id="address" cols="30" rows="3" placeholder="Address" class="form-control">{{!empty($address) ? $address->address : ''}}</textarea>
                                         <p></p>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <input type="text" name="appartment" id="appartment" class="form-control"
-                                            placeholder="Apartment, suite, unit, etc. (optional)">
+                                            placeholder="Apartment, suite, unit, etc. (optional)" value="{{!empty($address) ? $address->appartment : ''}}">
                                         <p></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <input type="text" name="city" id="city" class="form-control"
-                                            placeholder="City">
+                                            placeholder="City" value="{{!empty($address) ? $address->city : ''}}">
                                         <p></p>
 
                                     </div>
@@ -86,7 +86,7 @@ Checkout
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <input type="text" name="state" id="state" class="form-control"
-                                            placeholder="State">
+                                            placeholder="State" value="{{!empty($address) ? $address->state : ''}}">
                                         <p></p>
 
                                     </div>
@@ -94,14 +94,14 @@ Checkout
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <input type="text" name="zip" id="zip" class="form-control"
-                                            placeholder="Zip">
+                                            placeholder="Zip" value="{{!empty($address) ? $address->zip : ''}}">
                                         <p></p>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <input type="text" name="mobile" id="mobile" class="form-control"
-                                            placeholder="Mobile No.">
+                                            placeholder="Mobile No." value="{{!empty($address) ? $address->mobile : ''}}">
                                         <p></p>
                                     </div>
                                 </div>
@@ -212,6 +212,7 @@ Checkout
                 if (response['status'] == true) {
                     $("input[type='text'], input[type='number'], select").removeClass('is-invalid');
                     $('.error').removeClass('invalid-feedback').html('');
+                    window.location.href="{{route('user-thank')}}";
                 } else {
                     var errors = response['errors'];
                     console.log(errors);

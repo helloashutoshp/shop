@@ -5,6 +5,7 @@ namespace App\Http\Controllers\front;
 use App\Http\Controllers\Controller;
 use App\Models\CountryModel;
 use App\Models\orderModel;
+use App\Models\oredrItem;
 use App\Models\Product;
 use App\Models\userShipping;
 use Illuminate\Http\Request;
@@ -122,6 +123,8 @@ class shopController extends Controller
 
     public function checkOut()
     {
+        $user = Auth::user();
+        $address = userShipping::where('user_id', $user->id)->first();
         if (Cart::count() < 1) {
             return redirect()->route('shop');
         }
@@ -133,7 +136,7 @@ class shopController extends Controller
         }
         session()->forget('url.checkout');
         $country = CountryModel::all();
-        return view('front.checkout', ['country' => $country]);
+        return view('front.checkout', ['country' => $country, 'address' => $address]);
     }
 
     public function checkOutStore(Request $req)
@@ -176,10 +179,10 @@ class shopController extends Controller
             $order = new orderModel();
             if ($req->payment == "p-one") {
                 // dd("hey");
-                $shipping=0;
-                $discount=0;
-                $subtotal = Cart::subtotal(2,'.','');
-                $grandTotal = $shipping+$subtotal;
+                $shipping = 0;
+                $discount = 0;
+                $subtotal = Cart::subtotal(2, '.', '');
+                $grandTotal = $shipping + $subtotal;
 
                 $order->user_id = $user->id;
                 $order->shipping = $shipping;
@@ -198,6 +201,19 @@ class shopController extends Controller
                 $order->note = $req->order_notes;
                 $order->save();
             }
+            foreach (Cart::content() as $item) {
+                // dd($item->id);
+                $orderItem = new oredrItem();
+                $orderItem->order_id  = $order->id;
+                $orderItem->product_id   = $item->id;
+                $orderItem->name  = $item->name;
+                $orderItem->qty  = $item->qty;
+                $orderItem->price  = $item->price;
+                $orderItem->total  = $item->qty * $item->price;
+                $orderItem->save();
+            }
+
+            Cart::Destroy();
             return response()->json([
                 'status' => true,
                 'message' => "vlaidation done",
@@ -209,5 +225,10 @@ class shopController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
+    }
+
+    public function thankyou()
+    {
+        return view('front.thankyou');
     }
 }

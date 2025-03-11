@@ -164,58 +164,50 @@ Shop
 
 @section('custom-js')
 <script>
-    $("#example").ionRangeSlider({
-        // skin: "big",
-        min: 0,
-        max: 10000,
-        from: {
-            {
-                $priceTo
-            }
-        },
-        step: 10,
-        skin: 'round',
-        max_postfix: "+",
-        to: {
-            {
-                $priceFrom
-            }
-        },
-        type: 'double',
-        prefix: "$",
-        // grid: true,
-        // grid_num: 10,
-        onFinish: function() {
-            brandChecked();
-        }
-    });
-    var slider = $('#example').data('ionRangeSlider');
-    $('.brand-val').change(function() {
-        brandChecked();
-    })
-
-    $('#price').change(function() {
-        brandChecked();
-    })
-
-    function brandChecked() {
-        var brand = [];
-        $('.brand-val').each(function() {
-            if ($(this).is(':checked') == true) {
-                brand.push($(this).val());
+        $("#example").ionRangeSlider({
+            // skin: "big",
+            min: 0,
+            max: 10000,
+            from: {{ $priceTo }},
+            step: 10,
+            skin: 'round',
+            max_postfix: "+",
+            to: {{ $priceFrom }},
+            type: 'double',
+            prefix: "$",
+            // grid: true,
+            // grid_num: 10,
+            onFinish: function() {
+                brandChecked();
             }
         });
-        var url = '{{ url()->current() }}?';
-        url += '&rangeFrom=' + slider.result.from + '&rangeTo=' + slider.result.to;
-        if (brand.length > 0) {
-            url += '&brands=' + brand.toString();
+        var slider = $('#example').data('ionRangeSlider');
+        $('.brand-val').change(function() {
+            brandChecked();
+        })
+
+        $('#price').change(function() {
+            brandChecked();
+        })
+
+        function brandChecked() {
+            var brand = [];
+            $('.brand-val').each(function() {
+                if ($(this).is(':checked') == true) {
+                    brand.push($(this).val());
+                }
+            });
+            var url = '{{ url()->current() }}?';
+            url += '&rangeFrom=' + slider.result.from + '&rangeTo=' + slider.result.to;
+            if (brand.length > 0) {
+                url += '&brands=' + brand.toString();
+            }
+
+            var price = $('#price').val();
+
+            url += '&priceRange=' + price;
+
+            window.location.href = url;
         }
-
-        var price = $('#price').val();
-
-        url += '&priceRange=' + price;
-
-        window.location.href = url;
-    }
-</script>
+    </script>
 @endsection
