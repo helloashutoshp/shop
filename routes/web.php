@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\categoryCotroller;
 use App\Http\Controllers\admin\homeController;
 use App\Http\Controllers\admin\imageController;
 use App\Http\Controllers\admin\productController;
+use App\Http\Controllers\admin\shoppingCharge;
 use App\Http\Controllers\admin\subCategoryController;
 use App\Http\Controllers\basicController;
 use App\Http\Controllers\front\authController;
@@ -114,6 +115,12 @@ Route::group(['prefix' => '/admin'], function () {
         Route::post('/product/update/', [productController::class, 'update'])->name('admin-product-update');
         Route::post('/product/update/image', [productController::class, 'updateImage'])->name('update-productImage');
         Route::get('/product/image-delete', [productController::class, 'deleteProductImage'])->name('deleteProductImage');
+
+        //shipping routes
+        Route::group(['prefix' => '/shipping'], function () {
+            Route::get('/create', [shoppingCharge::class, 'index'])->name('shipping-index');
+            Route::post('/store', [shoppingCharge::class, 'store'])->name('shipping-store');
+        });
     });
 });
 Route::get('/stripe', [paymentController::class, 'index'])->name('payment-index');
