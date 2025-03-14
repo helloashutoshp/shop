@@ -87,4 +87,6 @@ class shoppingController extends Controller
 
         return view('front.product', ['product' => $product,'items' => $items]);
     }
+
+    
 }

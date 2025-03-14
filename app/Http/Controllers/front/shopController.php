@@ -7,6 +7,7 @@ use App\Models\CountryModel;
 use App\Models\orderModel;
 use App\Models\oredrItem;
 use App\Models\Product;
+use App\Models\shippingCharge;
 use App\Models\userShipping;
 use Illuminate\Http\Request;
 use Gloudemans\Shoppingcart\Facades\Cart;
@@ -115,16 +116,21 @@ class shopController extends Controller
     public function cartItems(Request $req)
     {
         $id = $req->id;
-        //  dd($id);
-        // $product = Product::find($id);
         $user_id = Auth::id();
-        dd($user_id);
     }
 
     public function checkOut()
     {
         $user = Auth::user();
-        $address = userShipping::where('user_id', $user->id)->first();
+        if ($user) {
+            $address = userShipping::where('user_id', $user->id)->first();
+            $country_id = $address->country_id;
+            $charge = shippingCharge::where('country_id', $country_id)->first();
+           
+            // dd(Cart::subtotal());
+            $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $charge->charge;
+            $subtotal = number_format($total, 2, '.', ',');
+        }
         if (Cart::count() < 1) {
             return redirect()->route('shop');
         }
@@ -136,7 +142,7 @@ class shopController extends Controller
         }
         session()->forget('url.checkout');
         $country = CountryModel::all();
-        return view('front.checkout', ['country' => $country, 'address' => $address]);
+        return view('front.checkout', ['country' => $country, 'address' => $address, 'charge' => $charge, 'total' => $subtotal]);
     }
 
     public function checkOutStore(Request $req)
@@ -181,9 +187,11 @@ class shopController extends Controller
                 // dd("hey");
                 $shipping = 0;
                 $discount = 0;
+                //2 → Displays 2 decimal places.
+                //. → Uses a dot as the decimal separator.
+                //'' → No separator for thousands.
                 $subtotal = Cart::subtotal(2, '.', '');
                 $grandTotal = $shipping + $subtotal;
-
                 $order->user_id = $user->id;
                 $order->shipping = $shipping;
                 $order->subtotal = $subtotal;
@@ -230,5 +238,23 @@ class shopController extends Controller
     public function thankyou()
     {
         return view('front.thankyou');
+    }
+
+    public function countryChange(Request $request)
+    {
+        $id = $request->id;
+        $shipping = shippingCharge::where('country_id', $id)->first();
+        if(!$shipping){
+            $shipping = shippingCharge::find(9);
+        }
+        $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $shipping->charge;
+        $subtotal = number_format($total, 2, '.', ',');
+        // dd($shipping);
+        $charge = $shipping->charge;
+        return response()->json([
+            'status' => true,
+            'charge' => $charge,
+            'subtotal' => $subtotal
+        ]);
     }
 }

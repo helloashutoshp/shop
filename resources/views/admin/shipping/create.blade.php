@@ -8,9 +8,6 @@
                 <div class="col-sm-6">
                     <h1>Create Country Charge</h1>
                 </div>
-                <div class="col-sm-6 text-right">
-                    <a href="" class="btn btn-primary">Back</a>
-                </div>
             </div>
         </div>
         <!-- /.container-fluid -->
@@ -51,7 +48,22 @@
                 </div>
                 <div class="pb-5 pt-3">
                     <button type="submit" class="btn btn-primary">Create</button>
-                    <a href="" class="btn btn-outline-dark ml-3">Cancel</a>
+                </div>
+            </form>
+            <form action="" id="otherShip">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="country">Shipping Charge For Rest Of Country</label>
+                                    <input type="text" class="form-control" name="others" id="others" value="{{$others->charge}}">
+                                    <p></p>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
                 </div>
             </form>
             <div class="card">
@@ -76,7 +88,8 @@
                                         <td>{{ $i }}</td>
                                         <td>{{ $item->name }}</td>
                                         <td>{{ $item->charge }}</td>
-                                        <td> <a href="">
+                                        <td>
+                                            <a href="{{ route('shipping-edit', ['id' => $item->id ?? 0]) }}">
                                                 <svg class="filament-link-icon w-4 h-4 mr-1"
                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                     fill="currentColor" aria-hidden="true">
@@ -85,7 +98,8 @@
                                                     </path>
                                                 </svg>
                                             </a>
-                                            <a href="#" class="text-danger w-4 h-4 mr-1">
+                                            <a href="#" onclick="deleteCategory({{ $item->id }})"
+                                                class="text-danger w-4 h-4 mr-1">
                                                 <svg wire:loading.remove.delay="" wire:target=""
                                                     class="filament-link-icon w-4 h-4 mr-1"
                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -97,7 +111,6 @@
                                             </a>
                                         </td>
                                     </tr>
-
                                     @php
                                         $i++;
                                     @endphp
@@ -142,5 +155,49 @@
                 }
             })
         });
+
+        $('#otherShip').submit(function(e) {
+            e.preventDefault();
+            console.log("hello");
+            var element = $(this);
+            $("button[type=submit]").prop('disabled', true);
+            $.ajax({
+                url: "{{ route('shipping-other-update') }}",
+                type: 'post',
+                data: element.serializeArray(),
+                dataType: 'json',
+                success: function(response) {
+                    $("button[type=submit]").prop('disabled', false);
+                    if (response['status'] == true) {
+                        $("input[type='text'], select").removeClass('is-invalid');
+                        $('.error').removeClass('invalid-feedback').html('');
+                        window.location.href = "{{ route('shipping-index') }}"
+                    } else {
+                        var errors = response['errors'];
+                        $("input[type='text'], input[type='number'], select").removeClass('is-invalid');
+                        $('.error').removeClass('invalid-feedback').html('');
+                        $.each(errors, function(key, value) {
+                            $(`#${key}`).addClass('is-invalid').siblings('p').addClass(
+                                'invalid-feedback').html(value);
+                        })
+                    }
+                }
+            })
+        });
+
+        function deleteCategory(id) {
+            if (confirm('Do you really want to delete this ?')) {
+                $.ajax({
+                    url: `{{ url('/admin/shipping/delete') }}/${id}`,
+                    type: 'get',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status == true) {
+                            window.location.href = "{{ route('shipping-index') }}"
+                        }
+                    }
+                });
+            }
+        }
     </script>
 @endsection

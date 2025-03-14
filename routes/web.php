@@ -40,6 +40,7 @@ Route::post('/cart/delete', [shopController::class, 'cartDelete'])->name('cartDe
 Route::get('/checkout', [shopController::class, 'checkOut'])->name('checkOut');
 Route::post('/checkout', [shopController::class, 'checkOutStore'])->name('user-checkout-store');
 Route::get('/thank-you', [shopController::class, 'thankyou'])->name('user-thank');
+Route::get('/country-change', [shopController::class, 'countryChange'])->name('countryChange');
 
 
 
@@ -120,6 +121,11 @@ Route::group(['prefix' => '/admin'], function () {
         Route::group(['prefix' => '/shipping'], function () {
             Route::get('/create', [shoppingCharge::class, 'index'])->name('shipping-index');
             Route::post('/store', [shoppingCharge::class, 'store'])->name('shipping-store');
+            Route::get('/edit/{id}', [shoppingCharge::class, 'edit'])->name('shipping-edit');
+            Route::post('/update', [shoppingCharge::class, 'update'])->name('shipping-update');
+            Route::get('/delete/{id}', [shoppingCharge::class, 'destroy'])->name('shipping-delete');
+            Route::post('/shippping/update', [shoppingCharge::class, 'otherShipUpdate'])->name('shipping-other-update');
+          
         });
     });
 });
