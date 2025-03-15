@@ -40,7 +40,7 @@
                     </div>
                     <input type="submit" class="btn btn-dark btn-block btn-lg" value="Login">
                 </form>
-                <div class="text-center small">Don't have an account? <a href="register.php">Sign up</a></div>
+                <div class="text-center small">Don't have an account? <a href="{{route('userRegister')}}">Sign up</a></div>
             </div>
         </div>
     </section>

@@ -122,27 +122,39 @@ class shopController extends Controller
     public function checkOut()
     {
         $user = Auth::user();
+        $charge = "";
+        $total = "";
+        $subtotal = "";
         if ($user) {
             $address = userShipping::where('user_id', $user->id)->first();
-            $country_id = $address->country_id;
-            $charge = shippingCharge::where('country_id', $country_id)->first();
-           
-            // dd(Cart::subtotal());
-            $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $charge->charge;
-            $subtotal = number_format($total, 2, '.', ',');
-        }
-        if (Cart::count() < 1) {
-            return redirect()->route('shop');
-        }
-        if (Auth::check() == false) {
-            if (!(session()->has('url.checkout'))) {
-                session(['url.checkout' => url()->current()]);
+            if ($address) {
+                $country_id = $address->country_id;
+                if ($country_id) {
+                    $ship = shippingCharge::where('country_id', $country_id)->first();
+                    if(!$ship){
+                    $ship = shippingCharge::find(9);
+                    }
+                    $charge = $ship->charge;
+                    $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $charge;
+                    $subtotal = number_format($total, 2, '.', ',');
+                } 
+            } else {
+                $subtotal = Cart::subtotal();
+                $charge = 100;
             }
-            return redirect()->route('userLogin');
+            if (Cart::count() < 1) {
+                return redirect()->route('shop');
+            }
+            if (Auth::check() == false) {
+                if (!(session()->has('url.checkout'))) {
+                    session(['url.checkout' => url()->current()]);
+                }
+                return redirect()->route('userLogin');
+            }
+            session()->forget('url.checkout');
+            $country = CountryModel::all();
+            return view('front.checkout', ['country' => $country, 'address' => $address, 'charge' => $charge, 'total' => $subtotal]);
         }
-        session()->forget('url.checkout');
-        $country = CountryModel::all();
-        return view('front.checkout', ['country' => $country, 'address' => $address, 'charge' => $charge, 'total' => $subtotal]);
     }
 
     public function checkOutStore(Request $req)
@@ -185,13 +197,15 @@ class shopController extends Controller
             $order = new orderModel();
             if ($req->payment == "p-one") {
                 // dd("hey");
-                $shipping = 0;
+                $shipping = $req->shippingCharge;
                 $discount = 0;
                 //2 → Displays 2 decimal places.
                 //. → Uses a dot as the decimal separator.
                 //'' → No separator for thousands.
                 $subtotal = Cart::subtotal(2, '.', '');
-                $grandTotal = $shipping + $subtotal;
+                $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $shipping;
+                $grandTotal = number_format($total, 2, '.', '');
+                // dd($grandTotal);
                 $order->user_id = $user->id;
                 $order->shipping = $shipping;
                 $order->subtotal = $subtotal;
@@ -244,7 +258,7 @@ class shopController extends Controller
     {
         $id = $request->id;
         $shipping = shippingCharge::where('country_id', $id)->first();
-        if(!$shipping){
+        if (!$shipping) {
             $shipping = shippingCharge::find(9);
         }
         $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $shipping->charge;

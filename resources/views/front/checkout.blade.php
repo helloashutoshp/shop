@@ -139,7 +139,8 @@
                                 </div>
                                 <div class="d-flex justify-content-between mt-2">
                                     <div class="h6"><strong>Shipping</strong></div>
-                                    <div class="h6 cart-shipping"><strong>{{ $charge->charge }}</strong></div>
+                                    <div class="h6 cart-shipping"><strong>{{ $charge}}</strong></div>
+                                    <input type="hidden" name="shippingCharge" class="shippingCharge" value={{$charge}}>
                                 </div>
                                 <div class="d-flex justify-content-between mt-2 summery-end">
                                     <div class="h5"><strong>Total</strong></div>
@@ -208,6 +209,7 @@
                     var total = response['subtotal'];
                     $('.cart-shipping > strong').html(charge);
                     $('.cart-total > strong').html(total);
+                    $('.shippingCharge').val(charge);
                 }
             })
         })
