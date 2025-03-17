@@ -3,6 +3,7 @@
 use App\Http\Controllers\admin\adminController;
 use App\Http\Controllers\admin\brandController;
 use App\Http\Controllers\admin\categoryCotroller;
+use App\Http\Controllers\admin\discountController;
 use App\Http\Controllers\admin\homeController;
 use App\Http\Controllers\admin\imageController;
 use App\Http\Controllers\admin\productController;
@@ -125,7 +126,12 @@ Route::group(['prefix' => '/admin'], function () {
             Route::post('/update', [shoppingCharge::class, 'update'])->name('shipping-update');
             Route::get('/delete/{id}', [shoppingCharge::class, 'destroy'])->name('shipping-delete');
             Route::post('/shippping/update', [shoppingCharge::class, 'otherShipUpdate'])->name('shipping-other-update');
-          
+        });
+
+        Route::group(['prefix' => '/discount'], function () {
+            Route::get('/create', [discountController::class, 'create'])->name('discount-create');
+            Route::post('/store', [discountController::class, 'store'])->name('discount-store');
+            Route::get('/discounts', [discountController::class, 'index'])->name('discount-index');
         });
     });
 });

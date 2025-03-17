@@ -131,13 +131,13 @@ class shopController extends Controller
                 $country_id = $address->country_id;
                 if ($country_id) {
                     $ship = shippingCharge::where('country_id', $country_id)->first();
-                    if(!$ship){
-                    $ship = shippingCharge::find(9);
+                    if (!$ship) {
+                        $ship = shippingCharge::find(9);
                     }
                     $charge = $ship->charge;
                     $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $charge;
                     $subtotal = number_format($total, 2, '.', ',');
-                } 
+                }
             } else {
                 $subtotal = Cart::subtotal();
                 $charge = 100;
