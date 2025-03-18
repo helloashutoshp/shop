@@ -8,20 +8,51 @@ use Illuminate\Http\Request;
 
 class imageController extends Controller
 {
-    public function index(Request $req){
-        $image = $req->image;
-        $ext = $image->getClientOriginalExtension();
-        $newname = time().'.'.$ext;
-        $imgTable = new Tempimage();
-        $imgTable->name = $newname;
-        $imgTable->save();
-        $image->move(public_path().'/temp',$newname);
-        $img_path = asset('temp/'.$newname);
-        return response()->json([
-            'status'=>true,
-            'imageId'=>$imgTable->id,
-            'imagePath'=>$img_path,
-            'message'=>'Image uploaded successfully'
-        ]);
+    public function index(Request $req)
+    {
+        $images = $req->file('image');  // Change to `$images` to handle multiple files
+        // dd($images);
+        $response = [];
+
+        foreach ($images as $image) {  // Loop through each uploaded file
+            $ext = $image->getClientOriginalExtension();
+            $newname = time() . rand(1000, 9999) . '.' . $ext;
+            $imgTable = new Tempimage();
+            $imgTable->name = $newname;
+            $imgTable->save();
+
+            $image->move(public_path() . '/temp', $newname);
+
+            $response[] = [
+                'status' => true,
+                'imageId' => $imgTable->id,
+                'imagePath' => asset('temp/' . $newname),
+                'message' => 'Image uploaded successfully'
+            ];
+        }
+
+        // dd($response);
+
+        return response()->json($response);
+    }
+
+    public function sinleIndex(Request $req)
+    {
+        $image = $req->file('image');  // Change to `$images` to handle multiple files
+        $response = []; 
+            $ext = $image->getClientOriginalExtension();
+            $newname = time() . rand(1000, 9999) . '.' . $ext;
+            $imgTable = new Tempimage();
+            $imgTable->name = $newname;
+            $imgTable->save();
+
+            $image->move(public_path() . '/temp', $newname);
+            // dd($imgTable->id);
+            return response()->json([
+                'status' => true,
+                'imageId' => $imgTable->id,
+                'imagePath' => asset('temp/' . $newname),
+                'message' => 'Image uploaded successfully'
+            ]);
     }
 }

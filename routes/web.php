@@ -87,6 +87,7 @@ Route::group(['prefix' => '/admin'], function () {
         Route::get('/get-slug', [categoryCotroller::class, 'slug'])->name('get-slug');
         Route::get('/category', [categoryCotroller::class, 'index'])->name('category-list');
         Route::post('/image-temp-create', [imageController::class, 'index'])->name('temp-image-create');
+        Route::post('/singleimage-temp-create', [imageController::class, 'sinleIndex'])->name('single-temp-image-create');
         Route::get('/category/edit/{id}', [categoryCotroller::class, 'edit'])->name('edit-category');
         Route::post('/category/update', [categoryCotroller::class, 'update'])->name('update-category');
         Route::get('/category/delete/{id}', [categoryCotroller::class, 'destroy'])->name('delete-category');

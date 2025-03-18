@@ -138,7 +138,7 @@
                     }
                 });
             },
-            url: "{{ route('temp-image-create') }}",
+            url: "{{ route('single-temp-image-create') }}",
             maxFiles: 1,
             paramName: 'image',
             addRemoveLinks: true,

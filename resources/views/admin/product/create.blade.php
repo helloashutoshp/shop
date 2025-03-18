@@ -208,7 +208,8 @@
                             <div class="card-body">
                                 <h2 class="h4 mb-3">Related product</h2>
                                 <div class="mb-3">
-                                    <select multiple name="related_product[]" id="related_product" class="related_product form-control">
+                                    <select multiple name="related_product[]" id="related_product"
+                                        class="related_product form-control">
 
                                     </select>
                                     <p class="error"></p>
@@ -233,7 +234,7 @@
     <script>
         $('.related_product').select2({
             ajax: {
-                url: '{{ route("product.related") }}',
+                url: '{{ route('product.related') }}',
                 dataType: 'json',
                 tags: true,
                 multiple: true,
@@ -317,25 +318,28 @@
             url: "{{ route('temp-image-create') }}",
             maxFiles: 10,
             paramName: 'image',
+            uploadMultiple: true,
             addRemoveLinks: true,
             acceptedFiles: "image/jpeg,image/png,image/jpg,image/gif",
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            success: function(file, res) {
-                var gallery = `
-                <div class="col-md-3" id="single-image${res.imageId}">
-                 <div class="card" >
-                    <input type="hidden" value="${res.imageId}" name="productImg[]" />
-                    <img class="card-img-top" src="${res.imagePath}" alt="Card image cap">  
-                    <div class="card-body">
-                        <a href="javascript:void(0)" onclick="deleteImage(${res.imageId})" class="btn btn-danger">Delete</a>    
-                    </div>
-                  </div>
-                </div>`
-                $('.image-gallery').append(gallery);
-
+            successmultiple: function(file, res) { // Change `success` to `successmultiple`
+                res.forEach(function(image) {
+                    var gallery = `
+                        <div class="col-md-3" id="single-image${image.imageId}">
+                        <div class="card">
+                            <input type="hidden" value="${image.imageId}" name="productImg[]" />
+                            <img class="card-img-top" src="${image.imagePath}" alt="Card image cap">
+                            <div class="card-body">
+                                <a href="javascript:void(0)" onclick="deleteImage(${image.imageId})" class="btn btn-danger">Delete</a>    
+                            </div>
+                        </div>
+                        </div>`;
+                    $('.image-gallery').append(gallery);
+                });
             },
+
             complete: function(file) {
                 this.removeFile(file);
             }
