@@ -250,3 +250,8 @@ Home
     }
 </script>
 @endsection
+
+{{-- $slug = Str::slug($title);  // Convert to slug format
+$count = Product::where('slug', 'LIKE', "{$slug}%")->count();
+
+return $count ? "{$slug}-{$count}" : $slug; --}}
