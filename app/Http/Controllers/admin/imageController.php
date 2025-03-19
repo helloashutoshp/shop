@@ -56,3 +56,5 @@ class imageController extends Controller
             ]);
     }
 }
+
+// https://chatgpt.com/c/67cf0728-36e8-8000-abd1-b4aff166cb8d
