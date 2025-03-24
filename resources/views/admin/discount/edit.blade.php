@@ -6,7 +6,7 @@
         <div class="container-fluid my-2">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Create Diacount Coupon</h1>
+                    <h1>Edit Diacount Coupon</h1>
                 </div>
                 <div class="col-sm-6 text-right">
                     <a href="{{route('discount-index')}}" class="btn btn-primary">Back</a>
@@ -19,15 +19,16 @@
     <section class="content">
         <!-- Default box -->
         <div class="container-fluid">
-            <form action="" id="discountForm">
+            <form action="" id="editDiscountForm">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <input type="hidden" name="id" value="{{$discount->id}}">
                                     <label for="name">Name*</label>
                                     <input type="text" name="name" id="name" class="form-control"
-                                        placeholder="Name">
+                                        placeholder="Name" value="{{$discount->name}}">
                                     <p class="error"></p>
                                 </div>
                             </div>
@@ -35,14 +36,14 @@
                                 <div class="mb-3">
                                     <label for="code">Code*</label>
                                     <input type="text" name="code" id="code" class="form-control"
-                                        placeholder="Disocunt Code">
+                                        placeholder="Disocunt Code" value="{{$discount->code}}">
                                     <p class="error"></p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="description">Description</label>
-                                    <textarea class="summernote" name="description" id="description" cols="30" rows="10"></textarea>
+                                    <textarea class="summernote" name="description" id="description" cols="30" rows="10">value="{{$discount->description}}"</textarea>
                                     <p class="error"></p>
                                 </div>
                             </div>
@@ -50,26 +51,26 @@
                                 <div class="mb-3">
                                     <label for="maxuses">Max uses*</label>
                                     <input type="number" name="maxuses" id="maxuses" class="form-control"
-                                        placeholder="Coupon Max Uses">
+                                        placeholder="Coupon Max Uses" value="{{$discount->max_uses}}">
                                     <p class="error"></p>
                                 </div>
                                 <div class="mb-3">
                                     <label for="maxuser">Max user uses*</label>
                                     <input type="number" name="maxuser" id="maxuser" class="form-control"
-                                        placeholder="Max User Uses">
+                                        placeholder="Max User Uses" value="{{$discount->max_uses_user}}">
                                     <p class="error"></p>
                                 </div>
                                 <div class="mb-3">
                                     <label for="dtype">Discount Type</label>
                                     <select name="dtype" id="dtype" class="form-control">
-                                        <option value="fixed">Fixed</option>
-                                        <option value="percent">Percent</option>
+                                        <option value="fixed" {{ $discount->type == 'fixed' ? 'selected' : '' }}>Fixed</option>
+                                        <option value="percent" {{ $discount->type == 'percent' ? 'selected' : '' }}>Percent</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
                                     <label for="dvalue">Discount Value*</label>
                                     <input type="number" name="dvalue" id="dvalue" class="form-control"
-                                        placeholder="Disocunt Value">
+                                        placeholder="Disocunt Value" value="{{$discount->dicount_amount}}">
                                     <p class="error"></p>
                                 </div>
                             </div>
@@ -77,7 +78,7 @@
                                 <div class="mb-3">
                                     <label for="minimum_amount">Minimum Amount*</label>
                                     <input type="number" name="minimum_amount" id="minimum_amount" class="form-control"
-                                        placeholder="Minimum Amount">
+                                        placeholder="Minimum Amount" value="{{$discount->minimum_amount}}">
                                     <p class="error"></p>
                                 </div>
                             </div>
@@ -85,8 +86,8 @@
                                 <div class="mb-3">
                                     <label for="status">Status</label>
                                     <select name="status" id="status" class="form-control">
-                                        <option value="1">Yes</option>
-                                        <option value="0">No</option>
+                                        <option value="1" {{ $discount->status == 1 ? 'selected' : '' }}>Yes</option>
+                                        <option value="0" {{ $discount->status == 0 ? 'selected' : '' }}>No</option>
                                     </select>
                                 </div>
                             </div>
@@ -94,7 +95,7 @@
                                 <div class="mb-3">
                                     <label for="starts_at">Disocunt Starts At*</label>
                                     <input type="text" name="starts_at" id="starts_at" class="form-control"
-                                        placeholder="Disocunt Starts At" autocomplete="off">
+                                        placeholder="Disocunt Starts At" autocomplete="off" value="{{$discount->starts_at}}">
                                     <p class="error"></p>
                                 </div>
                             </div>
@@ -102,7 +103,7 @@
                                 <div class="mb-3">
                                     <label for="starts_at">Disocunt Ends At*</label>
                                     <input type="text" name="ends_at" id="ends_at" class="form-control"
-                                        placeholder="Disocunt Ends At" autocomplete="off">
+                                        placeholder="Disocunt Ends At" autocomplete="off" value="{{$discount->ends_at}}">
                                     <p class="error"></p>
                                 </div>
                             </div>
@@ -110,7 +111,7 @@
                     </div>
                 </div>
                 <div class="pb-5 pt-3">
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                     <a href="" class="btn btn-outline-dark ml-3">Cancel</a>
                 </div>
             </form>
@@ -132,12 +133,12 @@
                 format: 'Y-m-d H:i:s',
             });
         });
-        $('#discountForm').submit(function(e) {
+        $('#editDiscountForm').submit(function(e) {
             e.preventDefault();
             var element = $(this);
             $("button[type=submit]").prop('disabled', true);
             $.ajax({
-                url: "{{ route('discount-store') }}",
+                url: "{{ route('discount-update') }}",
                 type: 'post',
                 data: element.serializeArray(),
                 dataType: 'json',

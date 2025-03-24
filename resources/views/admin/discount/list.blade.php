@@ -9,7 +9,7 @@
                     <h1>Discounts</h1>
                 </div>
                 <div class="col-sm-6 text-right">
-                    <a href="" class="btn btn-primary">New Product</a>
+                    <a href="{{route('discount-create')}}" class="btn btn-primary">Add New Coupon</a>
                 </div>
             </div>
         </div>
@@ -97,10 +97,10 @@
                                                 </svg>
                                             </td>
                                         @endif
-                                        <td>{{ $dis->starts_at }}</td>
-                                        <td>{{ $dis->ends_at }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($dis->starts_at)->format('d-m-Y')}}</td>
+                                        <td>{{\Carbon\Carbon::parse($dis->ends_at)->format('d-m-Y')}}</td>
                                         <td>
-                                            <a href="{{ route('admin-product-edit', $dis->id) }}">
+                                            <a href="{{ route('discount-edit', $dis->id) }}">
                                                 <svg class="filament-link-icon w-4 h-4 mr-1"
                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                     fill="currentColor" aria-hidden="true">
@@ -109,7 +109,7 @@
                                                     </path>
                                                 </svg>
                                             </a>
-                                            <a href="#" onclick=deleteCategory({{ $dis->id }})
+                                            <a href="#" onclick=deleteDiscount({{ $dis->id }})
                                                 class="text-danger w-4 h-4 mr-1">
                                                 <svg wire:loading.remove.delay="" wire:target=""
                                                     class="filament-link-icon w-4 h-4 mr-1"
@@ -139,18 +139,18 @@
 @endsection
 @section('custom')
     <script>
-        function deleteCategory(id) {
+        function deleteDiscount(id) {
             if (confirm('Do you really want to delete this ?')) {
                 $.ajax({
-                    url: `{{ url('/admin/product/delete') }}/${id}`,
+                    url: `{{ url('/admin/discount/delete') }}/${id}`,
                     type: 'get',
                     dataType: 'json',
                     success: function(response) {
                         if (response.status == true) {
-                            window.location.href = "{{ route('admin-product-list') }}"
+                            window.location.href = "{{ route('discount-index') }}"
                         } else {
                             console.log("delete");
-                            window.location.href = "{{ route('admin-product-list') }}"
+                            window.location.href = "{{ route('discount-index') }}"
                         }
                     }
                 });

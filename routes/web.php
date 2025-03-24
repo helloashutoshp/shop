@@ -129,10 +129,14 @@ Route::group(['prefix' => '/admin'], function () {
             Route::post('/shippping/update', [shoppingCharge::class, 'otherShipUpdate'])->name('shipping-other-update');
         });
 
+        //discounts routes
         Route::group(['prefix' => '/discount'], function () {
             Route::get('/create', [discountController::class, 'create'])->name('discount-create');
             Route::post('/store', [discountController::class, 'store'])->name('discount-store');
-            Route::get('/discounts', [discountController::class, 'index'])->name('discount-index');
+            Route::get('/list', [discountController::class, 'index'])->name('discount-index');
+            Route::get('/edit/{id}', [discountController::class, 'edit'])->name('discount-edit');
+            Route::post('/update', [discountController::class, 'update'])->name('discount-update');
+            Route::get('/delete/{id}', [discountController::class, 'delete'])->name('discount-delete');
         });
     });
 });
