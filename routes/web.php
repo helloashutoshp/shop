@@ -142,3 +142,4 @@ Route::group(['prefix' => '/admin'], function () {
 });
 Route::get('/stripe', [paymentController::class, 'index'])->name('payment-index');
 Route::post('/stripe', [paymentController::class, 'catch'])->name('payment-catch');
+// https://chatgpt.com/c/67cf0728-36e8-8000-abd1-b4aff166cb8d
