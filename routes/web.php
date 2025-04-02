@@ -55,6 +55,7 @@ Route::group(['prefix' => '/account'], function () {
     Route::group(['middleware' => 'auth'], function () {
         Route::get('/profile', [authController::class, 'profile'])->name('user-profile');
         Route::get('/logout', [authController::class, 'logout'])->name('user-logout');
+        Route::post('/apply-coupon', [shopController::class, 'couponStore'])->name('apply-coupon');
     });
 });
 

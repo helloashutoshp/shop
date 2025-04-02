@@ -4,11 +4,13 @@ namespace App\Http\Controllers\front;
 
 use App\Http\Controllers\Controller;
 use App\Models\CountryModel;
+use App\Models\discountModel;
 use App\Models\orderModel;
 use App\Models\oredrItem;
 use App\Models\Product;
 use App\Models\shippingCharge;
 use App\Models\userShipping;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Facades\Auth;
@@ -119,43 +121,7 @@ class shopController extends Controller
         $user_id = Auth::id();
     }
 
-    public function checkOut()
-    {
-        $user = Auth::user();
-        $charge = "";
-        $total = "";
-        $subtotal = "";
-        if ($user) {
-            $address = userShipping::where('user_id', $user->id)->first();
-            if ($address) {
-                $country_id = $address->country_id;
-                if ($country_id) {
-                    $ship = shippingCharge::where('country_id', $country_id)->first();
-                    if (!$ship) {
-                        $ship = shippingCharge::find(9);
-                    }
-                    $charge = $ship->charge;
-                    $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $charge;
-                    $subtotal = number_format($total, 2, '.', ',');
-                }
-            } else {
-                $subtotal = Cart::subtotal();
-                $charge = 100;
-            }
-            if (Cart::count() < 1) {
-                return redirect()->route('shop');
-            }
-            if (Auth::check() == false) {
-                if (!(session()->has('url.checkout'))) {
-                    session(['url.checkout' => url()->current()]);
-                }
-                return redirect()->route('userLogin');
-            }
-            session()->forget('url.checkout');
-            $country = CountryModel::all();
-            return view('front.checkout', ['country' => $country, 'address' => $address, 'charge' => $charge, 'total' => $subtotal]);
-        }
-    }
+
 
     public function checkOutStore(Request $req)
     {
@@ -176,7 +142,6 @@ class shopController extends Controller
         ]);
         if ($validator->passes()) {
             $user = Auth::user();
-            // session()->flash('success', 'Successfully  created');
             userShipping::updateOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -256,19 +221,146 @@ class shopController extends Controller
 
     public function countryChange(Request $request)
     {
+        $dp = 0;
+        $price = 0;
+        if (session()->has('discount')) {
+            $code = session()->get('discount');
+            $cartTotal =  floatval(str_replace(',', '', Cart::subtotal()));
+            if ($code->type == "fixed") {
+                $dp = $code->dicount_amount;
+                $price = $cartTotal - $dp;
+            } else {
+                $percentPrice = $cartTotal * $code->dicount_amount / 100;
+                $dp = $percentPrice;
+                $price = $cartTotal - $percentPrice;
+            }
+        }
         $id = $request->id;
         $shipping = shippingCharge::where('country_id', $id)->first();
         if (!$shipping) {
             $shipping = shippingCharge::find(9);
         }
-        $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $shipping->charge;
+        $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $shipping->charge - $price;
         $subtotal = number_format($total, 2, '.', ',');
         // dd($shipping);
         $charge = $shipping->charge;
         return response()->json([
             'status' => true,
             'charge' => $charge,
-            'subtotal' => $subtotal
+            'subtotal' => $subtotal,
+            'dp' => $dp
         ]);
+    }
+    public function couponStore(Request $request)
+    {
+        $coupon = $request->coupon;
+        $charge = $request->charge;
+        if ($coupon) {
+            $discount = discountModel::where('code', $coupon)->first();
+            if ($discount) {
+                $startDate = $discount->starts_at;
+                $endDate = $discount->ends_at;
+                $now = Carbon::now();
+                if ($startDate) {
+                    $formatStarDate = Carbon::parse($startDate)->startOfDay();
+                    if ($now->lt($formatStarDate)) {
+                        return response()->json([
+                            'status' => false,
+                            'errors' => ['coupon' => 'You are too early to use this coupon']
+                        ]);
+                    };
+                }
+                if ($endDate) {
+                    $formatEndDate = Carbon::parse($startDate)->endOfDay();
+                    if ($now->gt($formatEndDate)) {
+                        return response()->json([
+                            'status' => false,
+                            'errors' => ['coupon' => 'coupon Expire']
+                        ]);
+                    };
+                }
+                session()->put('discount', $discount);
+                $cartTotal = floatval(str_replace(',', '', Cart::subtotal()));
+                $discountAmount = 0;
+                $newTotal = $cartTotal;
+
+                if ($discount->type == "fixed") {
+                    $discountAmount = $discount->dicount_amount;
+                    $newTotal = $cartTotal - $discountAmount + $charge;
+                } else {
+                    $discountAmount = $cartTotal * ($discount->dicount_amount / 100);
+                    $newTotal = $cartTotal - $discountAmount + $charge;
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'subtotal' => number_format($cartTotal, 2),
+                    'discount' => number_format($discountAmount, 2),
+                    'total' => number_format($newTotal, 2)
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'errors' => ['coupon' => 'Invalid Coupon']
+                ]);
+            };
+        } else {
+            return response()->json([
+                'status' => false,
+                'errors' => ['coupon' => 'Please enter coupon']
+            ]);
+        }
+    }
+
+    public function checkOut(Request $request)
+    {
+        $cartTotal = floatval(str_replace(',', '', Cart::subtotal()));
+        $discountAmount = 0;
+        $newTotal = $cartTotal;
+        $discount = session()->get('discount');
+
+       
+        $user = Auth::user();
+        $charge = "";
+        $total = "";
+        $subtotal = "";
+        $dp = 0;
+        if ($user) {
+            $address = userShipping::where('user_id', $user->id)->first();
+            if ($address) {
+                $country_id = $address->country_id;
+                if ($country_id) {
+                    $ship = shippingCharge::where('country_id', $country_id)->first();
+                    if (!$ship) {
+                        $ship = shippingCharge::find(9);
+                    }
+                    $charge = $ship->charge;
+                    $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $charge;
+                    $subtotal = number_format($total, 2, '.', ',');
+                }
+            } else {
+                $subtotal = Cart::subtotal();
+                $charge = 100;
+            }
+            if (Cart::count() < 1) {
+                return redirect()->route('shop');
+            }
+            if ($discount->type == "fixed") {
+                $dp = $discount->dicount_amount;
+                $subtotal = $cartTotal - $dp + $charge;
+            } else {
+                $dp = $cartTotal * ($discount->dicount_amount / 100);
+                $subtotal = $cartTotal - $dp + $charge;
+            }
+
+            session()->forget('url.checkout');
+            $country = CountryModel::all();
+            return view('front.checkout', ['country' => $country, 'address' => $address, 'charge' => $charge, 'total' => $subtotal, 'dp' => $dp]);
+        } else {
+            if (!(session()->has('url.checkout'))) {
+                session(['url.checkout' => url()->current()]);
+            }
+            return redirect()->route('userLogin');
+        }
     }
 }

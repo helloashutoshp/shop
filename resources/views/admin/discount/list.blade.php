@@ -55,7 +55,6 @@
                                 <th>Status</th>
                                 <th>Starts At</th>
                                 <th>Ends At</th>
-                                <th width="100">Status</th>
                                 <th width="100">Action</th>
                             </tr>
                         </thead>
@@ -70,7 +69,6 @@
                                         <td>{{ $i }}</td>
                                         <td>{{ $dis->name }}</td>
                                         <td>{{ $dis->code }}</td>
-                                        <td>{{ $dis->name }}</td>
                                         <td>{{ $dis->description }}</td>
                                         <td>{{ $dis->max_uses }}</td>
                                         <td>{{ $dis->max_uses_user }}</td>

@@ -135,17 +135,38 @@
                                 @endforeach
                                 <div class="d-flex justify-content-between summery-end">
                                     <div class="h6"><strong>Subtotal</strong></div>
-                                    <div class="h6"><strong>{{ Cart::subtotal() }}</strong></div>
+                                    <div class="h6 subtotal"><strong>${{ Cart::subtotal() }}</strong></div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-2">
                                     <div class="h6"><strong>Shipping</strong></div>
-                                    <div class="h6 cart-shipping"><strong>{{ $charge}}</strong></div>
-                                    <input type="hidden" name="shippingCharge" class="shippingCharge" value={{$charge}}>
+                                    <div class="h6 cart-shipping"><strong>{{ $charge }}</strong></div>
+                                    <input type="hidden" name="shippingCharge" class="shippingCharge"
+                                        value={{ $charge }}>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <div class="h6"><strong>Discount</strong></div>
+                                    <div class="h6 cart-discount"><strong>{{ $dp }}</strong></div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-2 summery-end">
                                     <div class="h5"><strong>Total</strong></div>
                                     <div class="h5 cart-total"><strong>{{ $total }}</strong></div>
                                 </div>
+                            </div>
+                            
+                        </div>
+                        <div class="card">
+                            <div class="card-body input-gr0oup apply-coupan mt-4">
+                                <input type="text" id="coupon" placeholder="Coupon Code" class="form-control">
+                                <p></p>
+                                <button class="btn btn-dark mt-2 coupon" type="button" id="button-addon2">Apply
+                                    Coupon</button>
+                                    @if (Session::has('discount'))
+                                        @php
+                                         $dis =  Session::get('discount');
+                                        @endphp
+                                        <input type="text" readonly value="{{$dis->code}}">
+                                    @endif
+                                    <i class="fa-solid fa-xmark" style="color: #a81a1a;"></i>
                             </div>
                         </div>
                         <div class="card payment-form ">
@@ -243,6 +264,40 @@
                         var errors = response['errors'];
                         console.log(errors);
                         $("input[type='text'], input[type='number'], select").removeClass('is-invalid');
+                        $('.error').removeClass('invalid-feedback').html('');
+                        $.each(errors, function(key, value) {
+                            $(`#${key}`).addClass('is-invalid').siblings('p').addClass(
+                                'invalid-feedback').html(value);
+                        })
+                    }
+                }
+            })
+        });
+
+        $('.coupon').click(function(e) {
+            e.preventDefault();
+            // $("button[type=submit]").prop('disabled', true);
+            var coupon = $('#coupon').val();
+            var charge = $('.shippingCharge').val();
+            $.ajax({
+                url: "{{ route('apply-coupon') }}",
+                type: 'post',
+                data: {
+                    coupon: coupon,
+                    charge: charge
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response['status'] == true) {
+                        $("input").removeClass('is-invalid');
+                        $('.error').removeClass('invalid-feedback').html('');
+                        $('.subtotal > strong').html(`$${response.subtotal}`);
+                        $('.cart-discount > strong').html(`-$${response.discount}`);
+                        $('.cart-total > strong').html(`$${response.total}`);
+                    } else {
+                        var errors = response['errors'];
+                        console.log(errors);
+                        $("input").removeClass('is-invalid');
                         $('.error').removeClass('invalid-feedback').html('');
                         $.each(errors, function(key, value) {
                             $(`#${key}`).addClass('is-invalid').siblings('p').addClass(
