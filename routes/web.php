@@ -138,6 +138,7 @@ Route::group(['prefix' => '/admin'], function () {
             Route::get('/edit/{id}', [discountController::class, 'edit'])->name('discount-edit');
             Route::post('/update', [discountController::class, 'update'])->name('discount-update');
             Route::get('/delete/{id}', [discountController::class, 'delete'])->name('discount-delete');
+            Route::get('/coupon-remove', [shopController::class, 'couponRemoved'])->name('remove-coupon');
         });
     });
 });

@@ -152,21 +152,19 @@
                                     <div class="h5 cart-total"><strong>{{ $total }}</strong></div>
                                 </div>
                             </div>
-                            
+
                         </div>
                         <div class="card">
                             <div class="card-body input-gr0oup apply-coupan mt-4">
-                                <input type="text" id="coupon" placeholder="Coupon Code" class="form-control">
+                                @php
+                                    $dis = Session::get('discount');
+                                @endphp
+                                <input type="text" id="coupon" placeholder="Coupon Code" class="form-control"
+                                    value="{{ $dis ? $dis->code : '' }}">
                                 <p></p>
+                                <i class="fa-solid fa-xmark removeCoupon" style="color: #a81a1a;"></i>
                                 <button class="btn btn-dark mt-2 coupon" type="button" id="button-addon2">Apply
                                     Coupon</button>
-                                    @if (Session::has('discount'))
-                                        @php
-                                         $dis =  Session::get('discount');
-                                        @endphp
-                                        <input type="text" readonly value="{{$dis->code}}">
-                                    @endif
-                                    <i class="fa-solid fa-xmark" style="color: #a81a1a;"></i>
                             </div>
                         </div>
                         <div class="card payment-form ">
@@ -294,6 +292,8 @@
                         $('.subtotal > strong').html(`$${response.subtotal}`);
                         $('.cart-discount > strong').html(`-$${response.discount}`);
                         $('.cart-total > strong').html(`$${response.total}`);
+                        $('.coupon').val(`${response.dicount_code}`);
+                        // $('.discountCode-session').hide();
                     } else {
                         var errors = response['errors'];
                         console.log(errors);
@@ -307,5 +307,22 @@
                 }
             })
         });
+        $('.removeCoupon').click(function() {
+            var charge = $('.shippingCharge').val();
+            $.ajax({
+                url: "{{ route('remove-coupon') }}",
+                type: 'get',
+                data: {
+                    charge: charge,
+                },
+                dataType: 'json',
+                success: function(response) {
+                    $('.subtotal > strong').html(`$${response.subtotal}`);
+                    $('.cart-discount > strong').html(0);
+                    $('.cart-total > strong').html(`$${response.total}`);
+                    $('#coupon').val("");
+                }
+            })
+        })
     </script>
 @endsection

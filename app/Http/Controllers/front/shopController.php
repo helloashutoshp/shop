@@ -121,8 +121,6 @@ class shopController extends Controller
         $user_id = Auth::id();
     }
 
-
-
     public function checkOutStore(Request $req)
     {
         $validator = Validator::make($req->all(), [
@@ -161,16 +159,11 @@ class shopController extends Controller
 
             $order = new orderModel();
             if ($req->payment == "p-one") {
-                // dd("hey");
                 $shipping = $req->shippingCharge;
                 $discount = 0;
-                //2 → Displays 2 decimal places.
-                //. → Uses a dot as the decimal separator.
-                //'' → No separator for thousands.
                 $subtotal = Cart::subtotal(2, '.', '');
                 $total = (float) str_replace(',', '', Cart::subtotal()) + (float) $shipping;
                 $grandTotal = number_format($total, 2, '.', '');
-                // dd($grandTotal);
                 $order->user_id = $user->id;
                 $order->shipping = $shipping;
                 $order->subtotal = $subtotal;
@@ -271,7 +264,7 @@ class shopController extends Controller
                     };
                 }
                 if ($endDate) {
-                    $formatEndDate = Carbon::parse($startDate)->endOfDay();
+                    $formatEndDate = Carbon::parse($endDate)->endOfDay();
                     if ($now->gt($formatEndDate)) {
                         return response()->json([
                             'status' => false,
@@ -296,7 +289,8 @@ class shopController extends Controller
                     'status' => true,
                     'subtotal' => number_format($cartTotal, 2),
                     'discount' => number_format($discountAmount, 2),
-                    'total' => number_format($newTotal, 2)
+                    'total' => number_format($newTotal, 2),
+                    'dicount_code' => $discount->code
                 ]);
             } else {
                 return response()->json([
@@ -318,8 +312,6 @@ class shopController extends Controller
         $discountAmount = 0;
         $newTotal = $cartTotal;
         $discount = session()->get('discount');
-
-       
         $user = Auth::user();
         $charge = "";
         $total = "";
@@ -345,12 +337,14 @@ class shopController extends Controller
             if (Cart::count() < 1) {
                 return redirect()->route('shop');
             }
-            if ($discount->type == "fixed") {
-                $dp = $discount->dicount_amount;
-                $subtotal = $cartTotal - $dp + $charge;
-            } else {
-                $dp = $cartTotal * ($discount->dicount_amount / 100);
-                $subtotal = $cartTotal - $dp + $charge;
+            if ($discount) {
+                if ($discount->type == "fixed") {
+                    $dp = $discount->dicount_amount;
+                    $subtotal = $cartTotal - $dp + $charge;
+                } else {
+                    $dp = $cartTotal * ($discount->dicount_amount / 100);
+                    $subtotal = $cartTotal - $dp + $charge;
+                }
             }
 
             session()->forget('url.checkout');
@@ -362,5 +356,20 @@ class shopController extends Controller
             }
             return redirect()->route('userLogin');
         }
+    }
+
+    public function couponRemoved(Request $request)
+    {
+        session()->forget('discount');
+        $subtotal = floatval(str_replace(',', '', Cart::subtotal()));
+        $charge = $request->charge;
+        $total = $subtotal + $charge;
+        return response()->json([
+            'status' => true,
+            'charge' => $charge,
+            'total' => $total,
+            'subtotal' => $subtotal,
+            'message' => "coupon removed"
+        ]);
     }
 }
