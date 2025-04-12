@@ -146,10 +146,13 @@
                                 <div class="d-flex justify-content-between mt-2">
                                     <div class="h6"><strong>Discount</strong></div>
                                     <div class="h6 cart-discount"><strong>{{ $dp }}</strong></div>
+                                    <input type="hidden" class="totalDis" value={{ $dp }} name="totalDis">
+
                                 </div>
                                 <div class="d-flex justify-content-between mt-2 summery-end">
                                     <div class="h5"><strong>Total</strong></div>
                                     <div class="h5 cart-total"><strong>{{ $total }}</strong></div>
+                                    <input type="hidden" class="totalVal" value={{ $total }} name="totalVal">
                                 </div>
                             </div>
 
@@ -159,11 +162,12 @@
                                 @php
                                     $dis = Session::get('discount');
                                 @endphp
-                                <input type="text" id="coupon" placeholder="Coupon Code" class="form-control"
-                                    value="{{ $dis ? $dis->code : '' }}">
-                                <p></p>
+                                <input type="text" id="coupon" placeholder="Coupon Code"
+                                    class="form-control coupon" value="{{ $dis ? $dis->code : '' }}">
+                                    <p></p>
+                                <input type="hidden" class="code" name="code" value="{{ $dis ? $dis->code : '' }}">
                                 <i class="fa-solid fa-xmark removeCoupon" style="color: #a81a1a;"></i>
-                                <button class="btn btn-dark mt-2 coupon" type="button" id="button-addon2">Apply
+                                <button class="btn btn-dark mt-2 coupon-btn" type="button" id="button-addon2">Apply
                                     Coupon</button>
                             </div>
                         </div>
@@ -228,6 +232,7 @@
                     var total = response['subtotal'];
                     $('.cart-shipping > strong').html(charge);
                     $('.cart-total > strong').html(total);
+                    $('.totalVal').val(total);
                     $('.shippingCharge').val(charge);
                 }
             })
@@ -272,7 +277,7 @@
             })
         });
 
-        $('.coupon').click(function(e) {
+        $('.coupon-btn').click(function(e) {
             e.preventDefault();
             // $("button[type=submit]").prop('disabled', true);
             var coupon = $('#coupon').val();
@@ -286,13 +291,16 @@
                 },
                 dataType: 'json',
                 success: function(response) {
+                    console.log($('#coupon').length);
                     if (response['status'] == true) {
                         $("input").removeClass('is-invalid');
                         $('.error').removeClass('invalid-feedback').html('');
                         $('.subtotal > strong').html(`$${response.subtotal}`);
+                        $('.totalDis').val(response.discount);
                         $('.cart-discount > strong').html(`-$${response.discount}`);
                         $('.cart-total > strong').html(`$${response.total}`);
-                        $('.coupon').val(`${response.dicount_code}`);
+                        $('.totalVal').val(response.total);
+                        $('.code').val(response.dicount_code);
                         // $('.discountCode-session').hide();
                     } else {
                         var errors = response['errors'];
@@ -309,6 +317,7 @@
         });
         $('.removeCoupon').click(function() {
             var charge = $('.shippingCharge').val();
+            $('.coupon').val('');
             $.ajax({
                 url: "{{ route('remove-coupon') }}",
                 type: 'get',
@@ -319,8 +328,10 @@
                 success: function(response) {
                     $('.subtotal > strong').html(`$${response.subtotal}`);
                     $('.cart-discount > strong').html(0);
+                    $('.totalDis').val('');
                     $('.cart-total > strong').html(`$${response.total}`);
-                    $('#coupon').val("");
+                    $('.totalVal').val(response.total);
+                    $('.code').val('');
                 }
             })
         })

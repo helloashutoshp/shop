@@ -168,6 +168,7 @@ class shopController extends Controller
                 $order->shipping = $shipping;
                 $order->subtotal = $subtotal;
                 $order->grandTotal = $grandTotal;
+                $order->payment_status = "unpaid";
                 $order->firstName = $req->first_name;
                 $order->lastName = $req->last_name;
                 $order->email = $req->email;
@@ -179,6 +180,10 @@ class shopController extends Controller
                 $order->state = $req->state;
                 $order->zip = $req->zip;
                 $order->note = $req->order_notes;
+                $order->coupon_code = $req->code;
+                $order->grandTotal = str_replace(',', '', $req->totalVal);
+                $order->discount = str_replace(',', '', $req->totalDis);
+                $order->shipping = $req->shippingCharge;
                 $order->save();
             }
             foreach (Cart::content() as $item) {
@@ -194,6 +199,7 @@ class shopController extends Controller
             }
 
             Cart::Destroy();
+            session()->forget('discount');
             return response()->json([
                 'status' => true,
                 'message' => "vlaidation done",
@@ -218,7 +224,7 @@ class shopController extends Controller
         $price = 0;
         if (session()->has('discount')) {
             $code = session()->get('discount');
-            $cartTotal =  floatval(str_replace(',', '', Cart::subtotal()));
+            $cartTotal =  floatval(str_replace(',', '', Cart::subtotal()), 2);
             if ($code->type == "fixed") {
                 $dp = $code->dicount_amount;
                 $price = $cartTotal - $dp;
@@ -247,6 +253,8 @@ class shopController extends Controller
     public function couponStore(Request $request)
     {
         $coupon = $request->coupon;
+        $cartTotal = floatval(str_replace(',', '', Cart::subtotal()));
+        $cartTtl = Cart::subtotal();
         $charge = $request->charge;
         if ($coupon) {
             $discount = discountModel::where('code', $coupon)->first();
@@ -272,8 +280,35 @@ class shopController extends Controller
                         ]);
                     };
                 }
+                if ($discount->max_uses > 0) {
+                    $maxUses = orderModel::where('coupon_code', $discount->code)->count();
+                    if ($maxUses >= $discount->max_uses) {
+                        return response()->json([
+                            'status' => false,
+                            'errors' => ['coupon' => 'Coupon reached the max uses']
+                        ]);
+                    }
+                }
+                if ($discount->max_uses_user > 0) {
+                    $maxUserUses = orderModel::where(['coupon_code' => $discount->code, 'user_id' => Auth::user()->id])->count();
+                    if ($maxUserUses >= $discount->max_uses_user) {
+                        return response()->json([
+                            'status' => false,
+                            'errors' => ['coupon' => 'You have reached the maximum uses of this coupon']
+                        ]);
+                    }
+                }
+                $minimumAmount = floatval(str_replace(',', '', $discount->minimum_amount));
+                if ($discount->minimum_amount > 0) {
+                    // dd($cartTtl .' ' .$discount->minimum_amount
+                    if ($cartTotal < $minimumAmount) {
+                        return response()->json([
+                            'status' => false,
+                            'errors' => ['coupon' => "Minimum amount should be {$discount->minimum_amount} to use this coupon"]
+                        ]);
+                    }
+                }
                 session()->put('discount', $discount);
-                $cartTotal = floatval(str_replace(',', '', Cart::subtotal()));
                 $discountAmount = 0;
                 $newTotal = $cartTotal;
 
@@ -371,5 +406,18 @@ class shopController extends Controller
             'subtotal' => $subtotal,
             'message' => "coupon removed"
         ]);
+    }
+
+    public function orders()
+    {
+        $user = Auth::user();
+        $orders = orderModel::where('user_id', $user->id)->get();
+        return view('front.orders', ['orders' => $orders]);
+    }
+    public function ordersItems($id){
+        $orderItem = orderModel::find($id);
+        $items = oredrItem::where('order_id',$id)->get();
+        $count = $items->count();
+        return view('front.orderItem',['orderItem'=>$orderItem,'items'=>$items,'count'=> $count]); 
     }
 }

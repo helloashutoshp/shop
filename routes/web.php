@@ -56,6 +56,9 @@ Route::group(['prefix' => '/account'], function () {
         Route::get('/profile', [authController::class, 'profile'])->name('user-profile');
         Route::get('/logout', [authController::class, 'logout'])->name('user-logout');
         Route::post('/apply-coupon', [shopController::class, 'couponStore'])->name('apply-coupon');
+        Route::get('/my-orders', [shopController::class, 'orders'])->name('my-order');
+        Route::get('/order-items/{id}', [shopController::class, 'ordersItems'])->name('order-detail');
+
     });
 });
 
