@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\categoryCotroller;
 use App\Http\Controllers\admin\discountController;
 use App\Http\Controllers\admin\homeController;
 use App\Http\Controllers\admin\imageController;
+use App\Http\Controllers\admin\orderController;
 use App\Http\Controllers\admin\productController;
 use App\Http\Controllers\admin\shoppingCharge;
 use App\Http\Controllers\admin\subCategoryController;
@@ -58,7 +59,6 @@ Route::group(['prefix' => '/account'], function () {
         Route::post('/apply-coupon', [shopController::class, 'couponStore'])->name('apply-coupon');
         Route::get('/my-orders', [shopController::class, 'orders'])->name('my-order');
         Route::get('/order-items/{id}', [shopController::class, 'ordersItems'])->name('order-detail');
-
     });
 });
 
@@ -143,8 +143,12 @@ Route::group(['prefix' => '/admin'], function () {
             Route::get('/delete/{id}', [discountController::class, 'delete'])->name('discount-delete');
             Route::get('/coupon-remove', [shopController::class, 'couponRemoved'])->name('remove-coupon');
         });
+
+        //orders routes
+        Route::get('/orders', [orderController::class, 'orders'])->name('admin-order-list');
+        Route::get('/orders-detail/{id}', [orderController::class, 'orderDetail'])->name('admin-order-detail');
+        Route::post('/status-update', [orderController::class, 'statusUpdate'])->name('status-update');
     });
 });
 Route::get('/stripe', [paymentController::class, 'index'])->name('payment-index');
 Route::post('/stripe', [paymentController::class, 'catch'])->name('payment-catch');
-// https://chatgpt.com/c/67cf0728-36e8-8000-abd1-b4aff166cb8d
