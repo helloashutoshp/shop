@@ -33,7 +33,7 @@ class adminController extends Controller
                 return redirect()->route('admin-login')->with('error', 'Invalid email or password');
             }
         } else {
-            return redirect('/admin/login')->withErrors($validator)->withInput($request->only('email'));
+            return redirect()->route('admin-login')->withErrors($validator)->withInput($request->only('email'));
         }
     }
 }
